@@ -18,7 +18,7 @@ public class Venue {
     @Column(nullable = false)
     private String city;
     @Column(nullable = false)
-    private String adress;
+    private String address;
     @Column(nullable = false)
     private Integer capacity;
     @Column(nullable = false)
@@ -34,7 +34,7 @@ public class Venue {
         this.code = code;
         this.name = name;
         this.city = city;
-        this.adress = adress;
+        this.address = adress;
         this.capacity = capacity;
         this.active = active;
     }
@@ -47,8 +47,8 @@ public class Venue {
     public void setName(String name) {this.name = name;}
     public String getCity() {return city;}
     public void setCity(String city) {this.city = city;}
-    public String getAdress() {return adress;}
-    public void setAdress(String adress) {this.adress = adress;}
+    public String getAddress() {return address;}
+    public void setAddress(String adress) {this.address = adress;}
     public Integer getCapacity() {return capacity;}
     public void setCapacity(Integer capacity) {this.capacity = capacity;}
     public Boolean getActive() {return active;}
