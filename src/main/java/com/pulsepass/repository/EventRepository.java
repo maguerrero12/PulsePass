@@ -15,6 +15,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     // Eventos publicados ordenados por fecha (FR-EVT-005)
     List<Event> findByStatusOrderByEventDateAsc(EventStatus status);
+    boolean existsByEventCode(String eventCode);
 
     // Eventos por código de venue
     List<Event> findByVenueCode(String venueCode);
@@ -27,6 +28,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e JOIN e.artists a WHERE e.venue.city = :city AND a.stageName = :stageName")
     List<Event> findByVenueCityAndArtistStageName(@Param("city") String city, @Param("stageName") String stageName);
 
+
+
     // Eventos recomendados (FR-SRC-003)
     @Query("SELECT DISTINCT e FROM Event e JOIN e.artists a " +
             "WHERE e.status = :status AND e.eventDate > :date " +
@@ -37,4 +40,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             @Param("date") LocalDateTime date,
             @Param("city") String city,
             @Param("artistText") String artistText);
+
+
 }
