@@ -3,6 +3,7 @@ package com.pulsepass.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -22,6 +23,10 @@ public record RegisterUserRequest(
 
         String phone,
         String city,
+
+        @NotBlank(message = "Password is required")
+        @Size(min = 12, message = "Password must be at least 12 characters long")
+        String password,
 
         @NotNull(message = "Birth date is required")
         LocalDate birthDate
