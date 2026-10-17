@@ -9,6 +9,7 @@ import com.pulsepass.dto.response.EventSummaryResponse;
 import com.pulsepass.exception.BusinessRuleException;
 import com.pulsepass.exception.GlobalExceptionHandler;
 import com.pulsepass.exception.ResourceNotFoundException;
+import com.pulsepass.service.AuthorizationService;
 import com.pulsepass.service.EventService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,12 @@ class EventControllerTest {
 
     @MockitoBean
     private EventService service;
+    @MockitoBean
+    private AuthorizationService authorizationService;
+    @MockitoBean
+    private com.pulsepass.security.JwtService jwtService;
+    @MockitoBean
+    private com.pulsepass.security.CustomUserDetailsService customUserDetailsService;
 
     // TEST-CTRL-EVT-001 crear válido → 201
     @Test

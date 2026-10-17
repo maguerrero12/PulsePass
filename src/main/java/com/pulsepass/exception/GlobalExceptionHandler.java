@@ -98,4 +98,29 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+    // 403 - Forbidden (Cuando AuthorizationService o @PreAuthorize bloquean el acceso)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                ex.getMessage(),
+                Map.of()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    // 401 - Unauthorized (Cuando falla el login con BadCredentialsException, etc.)
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(org.springframework.security.core.AuthenticationException ex) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                "Invalid credentials",
+                Map.of()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }

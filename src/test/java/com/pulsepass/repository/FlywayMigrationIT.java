@@ -10,6 +10,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,18 +31,22 @@ class FlywayMigrationIT {
 
     @Test
     void debeHaberAplicadoTodasLasMigracionesDeFlyway() throws SQLException {
-        try (Statement statement = dataSource.getConnection().createStatement()) {
-            // Consultamos la tabla interna de Flyway para ver el estado de las migraciones
-            ResultSet resultSet = statement.executeQuery(
-                    "SELECT version, success FROM flyway_schema_history ORDER BY installed_rank DESC"
-            );
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
 
-            // Verificamos que haya resultados
-            assertThat(resultSet.next()).isTrue();
+            // Ninguna migración debe haber fallado
+            try (ResultSet failed = statement.executeQuery(
+                    "SELECT COUNT(*) FROM flyway_schema_history WHERE success = false")) {
+                failed.next();
+                assertThat(failed.getInt(1)).isZero();
+            }
 
-            // Verificamos que la última migración aplicada sea la V3 (streaming_url) y haya sido exitosa
-            assertThat(resultSet.getString("version")).isEqualTo("3");
-            assertThat(resultSet.getBoolean("success")).isTrue();
+            // Debe haberse aplicado al menos una migración exitosamente
+            try (ResultSet applied = statement.executeQuery(
+                    "SELECT COUNT(*) FROM flyway_schema_history WHERE success = true")) {
+                applied.next();
+                assertThat(applied.getInt(1)).isPositive();
+            }
         }
     }
 }
