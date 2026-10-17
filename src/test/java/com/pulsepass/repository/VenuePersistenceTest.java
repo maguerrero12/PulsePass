@@ -3,7 +3,6 @@ package com.pulsepass.repository;
 import com.pulsepass.domain.Venue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -29,58 +28,47 @@ class VenuePersistenceTest {
     @Autowired
     private VenueRepository venueRepository;
 
-    @Test
-    void debePersistirYRecuperarVenuePorCodigo() {
+    private Venue crearVenue(String code, String name, int capacity) {
         Venue venue = new Venue();
-        venue.setCode("VEN-SMR-01");
-        venue.setName("Marina Convention Center");
+        venue.setCode(code);
+        venue.setName(name);
         venue.setCity("Santa Marta");
         venue.setAddress("Bahía");
-        venue.setCapacity(5000);
+        venue.setCapacity(capacity);
         venue.setActive(true);
+        return venue;
+    }
 
-        venueRepository.saveAndFlush(venue);
+    // AC-001 / FR-VEN-001
+    @Test
+    void debePersistirYRecuperarVenuePorCodigo() {
+        venueRepository.saveAndFlush(crearVenue("VEN-SMR-01", "Marina Convention Center", 5000));
 
         Optional<Venue> recuperado = venueRepository.findByCode("VEN-SMR-01");
+
         assertThat(recuperado).isPresent();
+        assertThat(recuperado.get().getName()).isEqualTo("Marina Convention Center");
         assertThat(recuperado.get().getCapacity()).isEqualTo(5000);
     }
 
+    // FR-VEN-002: código único
     @Test
     void debeRechazarConCodigoDuplicado() {
+        venueRepository.saveAndFlush(crearVenue("VENUE-DUP", "Local A", 100));
 
-        Venue venue1 = new Venue();
-        venue1.setName("Local A");
-        venue1.setCode("VENUE-DUP");
-        venue1.setAddress("Avenida 1");
-        venue1.setActive(true);
-        venue1.setCapacity(100);
-        venue1.setCity("Santa Marta");
-        venueRepository.saveAndFlush(venue1);
+        Venue duplicado = crearVenue("VENUE-DUP", "Local B", 200);
 
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            Venue venue2 = new Venue();
-            venue2.setName("Local B");
-            venue2.setCode("VENUE-DUP");
-            venue2.setAddress("Avenida 2");
-            venue2.setActive(true);
-            venue2.setCapacity(200);
-            venue2.setCity("Bogotá");
-
-            venueRepository.saveAndFlush(venue2);
-        });
+        assertThrows(DataIntegrityViolationException.class,
+                () -> venueRepository.saveAndFlush(duplicado));
     }
 
+    // FR-VEN-003: capacidad mayor que cero (el resto de campos es válido)
     @Test
     void debeRechazarVenueConCapacidadInvalida() {
-        Venue venue = new Venue();
-        venue.setCode("VEN-ERR");
-        venue.setName("Lugar Pequeño");
-        venue.setCapacity(0); // Viola el CHECK (capacity > 0)
+        Venue invalido = crearVenue("VEN-ERR", "Lugar Pequeño", 0);
 
-        assertThrows(DataIntegrityViolationException.class, () -> venueRepository.saveAndFlush(venue));
+        assertThrows(DataIntegrityViolationException.class,
+                () -> venueRepository.saveAndFlush(invalido));
     }
 }
-
 
