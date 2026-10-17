@@ -23,8 +23,7 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventResponse> create(@Valid @RequestBody CreateEventRequest request) {
-        EventResponse response = eventService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventService.create(request));
     }
 
     @GetMapping("/{eventCode}")
@@ -33,23 +32,18 @@ public class EventController {
     }
 
     @GetMapping("/published")
-    public ResponseEntity<List<EventSummaryResponse>>
-    findPublishedEvents() {
+    public ResponseEntity<List<EventSummaryResponse>> findPublished() {
         return ResponseEntity.ok(eventService.findPublishedEvents());
     }
 
     @PatchMapping("/{eventCode}/publish")
-    public ResponseEntity<EventResponse>
-    publish(@PathVariable String eventCode) {
+    public ResponseEntity<EventResponse> publish(@PathVariable String eventCode) {
         return ResponseEntity.ok(eventService.publish(eventCode));
     }
 
     @PostMapping("/{eventCode}/artists/{artistId}")
-    public ResponseEntity<EventResponse>
-    addArtist(
-            @PathVariable String eventCode,
-            @PathVariable Long artistId
-    ) {
+    public ResponseEntity<EventResponse> addArtist(@PathVariable String eventCode,
+                                                   @PathVariable Long artistId) {
         return ResponseEntity.ok(eventService.addArtist(eventCode, artistId));
     }
 

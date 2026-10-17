@@ -4,6 +4,8 @@ import com.pulsepass.dto.request.RegisterUserRequest;
 import com.pulsepass.dto.response.UserResponse;
 import com.pulsepass.exception.DuplicateResourceException;
 import com.pulsepass.exception.GlobalExceptionHandler;
+import com.pulsepass.service.AuthService;
+import com.pulsepass.service.AuthorizationService;
 import com.pulsepass.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,10 +31,20 @@ class UserControllerTest {
 
     @MockitoBean
     private UserService service;
+    @MockitoBean
+    private AuthService authService; // Inyectado porque el UserController actual lo usa para registrar
 
-    //TEST-CTRL-USR-001 registrar válido → 201
+    @MockitoBean
+    private AuthorizationService authorizationService;
+
+    @MockitoBean
+    private com.pulsepass.security.JwtService jwtService;
+    @MockitoBean
+    private com.pulsepass.security.CustomUserDetailsService customUserDetailsService;
+
+    // TEST-CTRL-USR-001 registrar válido → 201
     @Test
-    void shouldRegisterValidUser() throws Exception{
+    void shouldRegisterValidUser() throws Exception {
 
         UserResponse response = new UserResponse(
                 1L,
@@ -42,33 +53,37 @@ class UserControllerTest {
                 true
         );
 
-        when(service.register(any(RegisterUserRequest.class))).thenReturn(response);
+        // UserController ahora delega el registro atómico al authService
+        when(authService.register(any(RegisterUserRequest.class))).thenReturn(response);
 
-        String request = """
-                {
-                    "username": "andrea",
-                    "email": "andrea@email.com",
-                    "firstName": "Andrea",
-                    "lastName": "Garcia",
-                    "phone": "3001234567",
-                    "city": "Santa Marta",
-                    "birthDate": "2001-06-10"
-                }
-                """;
+        String jsonRequest = """
+        {
+          "username": "andrea",
+          "email": "andrea@email.com",
+          "firstName": "Andrea",
+          "lastName": "Garcia",
+          "phone": "3001234567",
+          "city": "Santa Marta",
+          "birthDate": "2001-06-10",
+          "password": "PasswordSegura123!" 
+        }
+        """;
 
         mockMvc.perform(post("/api/users")
-                    .contentType(MediaType.APPLICATION_JSON).content(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)) // Usamos jsonRequest correctamente
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("andrea"));
 
-        verify(service).register(any(RegisterUserRequest.class));
+        verify(authService).register(any(RegisterUserRequest.class));
     }
 
-    //TEST-CTRL-USR-002 email inválido → 400
+    // TEST-CTRL-USR-002 email inválido → 400
     @Test
-    void shouldReturn400WhenEmailIsInvalid() throws Exception{
+    void shouldReturn400WhenEmailIsInvalid() throws Exception {
 
-        String request = """
+        // Se incluye el password para que pase la validación de tamaño y no falle antes de evaluar el email
+        String jsonRequest = """
                 {
                     "username": "laura",
                     "email": "laura-email-invalido",
@@ -76,12 +91,14 @@ class UserControllerTest {
                     "lastName": "Martinez",
                     "phone": "3009876543",
                     "city": "Santa Marta",
-                    "birthDate": "2009-07-20"
+                    "birthDate": "2009-07-20",
+                    "password": "PasswordSegura123!"
                 }
                 """;
 
         mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON).content(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
@@ -89,43 +106,45 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.details.email")
                         .value("Email must be valid"));
 
-        verify(service, never()).register(any(RegisterUserRequest.class));
+        verify(authService, never()).register(any(RegisterUserRequest.class));
     }
 
-    //TEST-CTRL-USR-003 username duplicado → 409
+    // TEST-CTRL-USR-003 username duplicado → 409
     @Test
-    void shouldReturn409WhenUsernameExists() throws Exception{
+    void shouldReturn409WhenUsernameExists() throws Exception {
 
-        when(service.register(any(RegisterUserRequest.class)))
+        when(authService.register(any(RegisterUserRequest.class)))
                 .thenThrow(new DuplicateResourceException(
                         "This username already exists: carlos"));
 
-        String request = """
+        String jsonRequest = """
                 {
-                    "username": "carlos",
-                    "email": "carlos@email.com",
-                    "firstName": "Carlos",
-                    "lastName": "Rodriguez",
-                    "phone": "3011234567",
-                    "city": "Santa Marta",
-                    "birthDate": "2005-04-15"
+                  "username": "carlos",
+                  "email": "carlos@email.com",
+                  "firstName": "Carlos",
+                  "lastName": "Garcia",
+                  "phone": "3001234567",
+                  "city": "Santa Marta",
+                  "birthDate": "2001-06-10",
+                  "password": "PasswordSegura123!" 
                 }
                 """;
 
         mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON).content(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)) // Usamos jsonRequest correctamente
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.error").value("Conflict"))
                 .andExpect(jsonPath("$.message")
                         .value("This username already exists: carlos"));
 
-        verify(service).register(any(RegisterUserRequest.class));
+        verify(authService).register(any(RegisterUserRequest.class));
     }
 
-    //TEST-CTRL-USR-004 consultar por email → 200
+    // TEST-CTRL-USR-004 consultar por email → 200
     @Test
-    void shouldReturnUserByEmail() throws Exception{
+    void shouldReturnUserByEmail() throws Exception {
 
         UserResponse response = new UserResponse(
                 4L,
@@ -137,16 +156,16 @@ class UserControllerTest {
         when(service.findByEmail("miguel@email.com")).thenReturn(response);
 
         mockMvc.perform(get("/api/users/by-email")
-                    .param("email", "miguel@email.com"))
+                        .param("email", "miguel@email.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("miguel@email.com"));
 
         verify(service).findByEmail("miguel@email.com");
     }
 
-    //TEST-CTRL-USR-005 consultar por username → 200
+    // TEST-CTRL-USR-005 consultar por username → 200
     @Test
-    void shouldReturnUserByUsername() throws Exception{
+    void shouldReturnUserByUsername() throws Exception {
 
         UserResponse response = new UserResponse(
                 2L,
