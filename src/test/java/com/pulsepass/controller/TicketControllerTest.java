@@ -7,12 +7,14 @@ import com.pulsepass.dto.response.TicketResponse;
 import com.pulsepass.exception.BusinessRuleException;
 import com.pulsepass.exception.GlobalExceptionHandler;
 import com.pulsepass.exception.ResourceNotFoundException;
+import com.pulsepass.service.AuthorizationService;
 import com.pulsepass.service.TicketService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,6 +38,14 @@ class TicketControllerTest {
 
     @MockitoBean
     private TicketService service;
+    @MockitoBean
+    private AuthorizationService authorizationService;
+    @MockitoBean
+    private com.pulsepass.security.JwtService jwtService;
+    @MockitoBean
+    private com.pulsepass.security.CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private TicketService ticketService;
 
     //TEST-CTRL-TKT-001 compra válida → 201
     @Test
@@ -217,29 +227,23 @@ class TicketControllerTest {
         verify(service).findByUserEmail("andrea@example.com");
     }
 
+
+
     //TEST-CTRL-TKT-007 tickets PAID por evento → 200
     @Test
+    @WithMockUser(roles = "STAFF")
     void shouldFindPaidTicketsByEvent() throws Exception {
-
         List<TicketResponse> response = List.of(
                 new TicketResponse(
-                        1L,
-                        "TCK-12345678",
-                        TicketType.GENERAL,
-                        new BigDecimal("150000.00"),
-                        TicketStatus.PAID,
-                        LocalDateTime.of(2026, 12, 1, 10, 0),
-                        "andrea@example.com",
-                        "CMF-2026",
-                        "Caribbean Music Fest 2026"
-
+                        1L, "TCK-12345678", TicketType.GENERAL, new BigDecimal("150000.00"),
+                        TicketStatus.PAID, LocalDateTime.of(2026, 12, 1, 10, 0),
+                        "andrea@example.com", "CMF-2026", "Caribbean Music Fest 2026"
                 )
         );
 
         when(service.findPaidTicketsByEvent("CMF-2026")).thenReturn(response);
 
-        mockMvc.perform(get("/api/events/{eventCode}/tickets/paid",
-                        "CMF-2026"))
+        mockMvc.perform(get("/api/events/CMF-2026/tickets/paid")) // <-- Ruta absoluta completa
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].ticketCode").value("TCK-12345678"))
@@ -247,7 +251,6 @@ class TicketControllerTest {
 
         verify(service).findPaidTicketsByEvent("CMF-2026");
     }
-
     //TEST-CTRL-TKT-008 cancelar válido → 200
     @Test
     void shouldCancelTicketCorrectly() throws Exception {

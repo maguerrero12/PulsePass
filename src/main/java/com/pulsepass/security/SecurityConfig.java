@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/events/*/publish").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/events/*/artists/*").hasRole("ADMIN")
 
-                        // Exclusivos de STAFF o ADMIN
+                        // Exclusivos de STAFF o ADMIN (Usando * en lugar de {ticketCode})
                         .requestMatchers(HttpMethod.PATCH, "/api/tickets/*/use").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/events/*/tickets/paid").hasAnyRole("STAFF", "ADMIN")
 

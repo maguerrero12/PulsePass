@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,

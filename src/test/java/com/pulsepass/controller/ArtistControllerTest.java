@@ -4,6 +4,7 @@ import com.pulsepass.dto.response.ArtistResponse;
 import com.pulsepass.exception.GlobalExceptionHandler;
 import com.pulsepass.exception.ResourceNotFoundException;
 import com.pulsepass.service.ArtistService;
+import com.pulsepass.service.AuthorizationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -29,6 +30,13 @@ class ArtistControllerTest {
 
     @MockitoBean
     private ArtistService service;
+
+    @MockitoBean
+    private AuthorizationService authorizationService;
+    @MockitoBean
+    private com.pulsepass.security.JwtService jwtService;
+    @MockitoBean
+    private com.pulsepass.security.CustomUserDetailsService customUserDetailsService;
 
     //TEST-CTRL-ART-001 buscar por ID → 200
     @Test

@@ -3,6 +3,7 @@ package com.pulsepass.controller;
 import com.pulsepass.dto.response.VenueResponse;
 import com.pulsepass.exception.GlobalExceptionHandler;
 import com.pulsepass.exception.ResourceNotFoundException;
+import com.pulsepass.service.AuthorizationService;
 import com.pulsepass.service.VenueService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,12 @@ class VenueControllerTest {
 
     @MockitoBean
     private VenueService service;
+    @MockitoBean
+    private AuthorizationService authorizationService;
+    @MockitoBean
+    private com.pulsepass.security.JwtService jwtService;
+    @MockitoBean
+    private com.pulsepass.security.CustomUserDetailsService customUserDetailsService;
 
     //TEST-CTRL-VEN-001 venue existente → 200
     @Test
