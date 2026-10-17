@@ -45,6 +45,7 @@ class UserServiceImplTest {
                 "Gomez",
                 "3001234567",
                 "Santa Marta",
+                "Password123!",
                 LocalDate.of(2001, 5, 10)
         );
 
@@ -81,6 +82,7 @@ class UserServiceImplTest {
                 "Perez",
                 "3009876543",
                 "Santa Marta",
+                "Password123!",
                 LocalDate.of(2005, 3, 15)
         );
 
@@ -105,6 +107,7 @@ class UserServiceImplTest {
                 "Martinez",
                 "3011234567",
                 "Santa Marta",
+                "Password123!",
                 LocalDate.of(2009, 7, 20)
         );
 
@@ -129,6 +132,7 @@ class UserServiceImplTest {
                 "Rodriguez",
                 "3007654321",
                 "Santa Marta",
+                "Password123!",
                 LocalDate.of(2027, 1, 10)
         );
 
