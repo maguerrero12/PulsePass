@@ -1,0 +1,107 @@
+{
+  "info": {
+    "_postman_id": "e2923052-8490-4bb4-a135-a61bb25f15b8",
+    "name": "PulsePass E2E Manual",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59028403",
+    "_collection_link": "https://go.postman.co/collection/59028403-e2923052-8490-4bb4-a135-a61bb25f15b8?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "00 Preparación / conectividad",
+      "item": []
+    },
+    {
+      "name": "01 Venues (2 rutas)",
+      "item": []
+    },
+    {
+      "name": "02 Artists (3 rutas)",
+      "item": []
+    },
+    {
+      "name": "03 Auth / usuarios (registro, login, me)",
+      "item": [
+        {
+          "name": "POST Registro Usuario A",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"usuarioA\",\r\n  \"email\": \"usuarioa@test.com\",\r\n  \"password\": \"UnaFraseSeguraLarga2026!\",\r\n  \"firstName\": \"Usuario\",\r\n  \"lastName\": \"A\",\r\n  \"phone\": \"3000000000\",\r\n  \"city\": \"Santa Marta\",\r\n  \"birthDate\": \"2006-01-01\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Login Usuario A",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"identifier\": \"usuarioA\",\r\n  \"password\": \"UnaFraseSeguraLarga2026!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 Usuarios / consulta y propiedad (2 rutas)",
+      "item": []
+    },
+    {
+      "name": "05 Events / administración y visibilidad (6 rutas)",
+      "item": []
+    },
+    {
+      "name": "06 Tickets / compra, consulta y ciclo de vida (6 rutas)",
+      "item": []
+    },
+    {
+      "name": "07 Seguridad / escenarios negativos",
+      "item": []
+    },
+    {
+      "name": "08 Validaciones y errores HTTP",
+      "item": []
+    },
+    {
+      "name": "09 Flujos de negocio / secuencia recomendada",
+      "item": []
+    }
+  ]
+}
