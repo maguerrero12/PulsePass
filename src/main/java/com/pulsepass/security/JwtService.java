@@ -35,7 +35,7 @@ public class JwtService {
         Instant now = Instant.now();
 
         return Jwts.builder()
-                .subject(principal.getId().toString())
+                .subject(principal.getUsername())
                 .issuer(expectedIssuer)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(ttl)))

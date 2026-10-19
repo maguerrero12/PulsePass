@@ -1,20 +1,20 @@
 # Checklist de Ejecución Manual E2E - PulsePass
 
 ## Flujo A - Descubrimiento Público
-- [ ] GET `/api/venues/active` (Guardar `venueActiveCode`)
-- [ ] GET `/api/venues/{code}` (200 OK)
-- [ ] GET `/api/artists/active` (Guardar `artistId`)
-- [ ] GET `/api/artists/{id}` y `/api/artists/by-stage-name` (200 OK)
-- [ ] GET `/api/events/published` (Asegurar que no salen borradores)
+- [ x ] GET `/api/venues/active` (Guardar `venueActiveCode`)
+- [ x ] GET `/api/venues/{code}` (200 OK)
+- [ x ] GET `/api/artists/active` (Guardar `artistId`)
+- [ x ] GET `/api/artists/{id}` y `/api/artists/by-stage-name` (200 OK)
+- [ x ] GET `/api/events/published` (Asegurar que no salen borradores)
 - [ ] GET `/api/events/{eventCode}` (200 OK)
 - [ ] GET `/api/events/by-artist` (200 OK)
 
 ## Flujo B - Registro y JWT
-- [ ] POST `/api/users` (Registrar `USER_A` y `USER_B` con contraseñas fuertes)
-- [ ] POST `/api/auth/login` (Login de A, B, STAFF y ADMIN)
+- [ x ] POST `/api/users` (Registrar `USER_A` y `USER_B` con contraseñas fuertes)
+- [ x ] POST `/api/auth/login` (Login de A, B, STAFF y ADMIN)
 - [ ] Copiar los 4 `accessToken` a las variables de entorno locales de Postman.
-- [ ] GET `/api/auth/me` (Con cada token, verificar identidad correcta)
-- [ ] Validar errores: Contraseña incorrecta, token inválido y ausencia de token (401).
+- [ x ] GET `/api/auth/me` (Con cada token, verificar identidad correcta)
+- [ x ] Validar errores: Contraseña incorrecta, token inválido y ausencia de token (401).
 
 ## Flujo C - Gestión del Catálogo (ADMIN)
 - [ ] POST `/api/events` (Crear evento futuro con ADMIN)
@@ -33,6 +33,6 @@
 - [ ] PATCH `/api/tickets/{code}/use` (STAFF intenta usar un ticket cancelado -> Error de negocio)
 
 ## Flujo E - Regresión de Errores
-- [ ] Ejecutar validaciones 400 (Bad Request).
-- [ ] Ejecutar recursos ausentes 404 (Not Found).
-- [ ] Verificar formato unificado de `ErrorResponse`.
+- [ x ] Ejecutar validaciones 400 (Bad Request).
+- [ x ] Ejecutar recursos ausentes 404 (Not Found).
+- [ x ] Verificar formato unificado de `ErrorResponse`.

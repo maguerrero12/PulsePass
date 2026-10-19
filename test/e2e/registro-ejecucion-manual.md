@@ -1,12 +1,18 @@
-# Registro de Ejecución Manual E2E - PulsePass
+# Registro de Ejecución Manual E2E - PulsePass (Fase 5)
 
-| Caso | Actor | Ruta | HTTP Esperado | HTTP Observado | JSON/Estado Observado | Resultado | Evidencia / Observación |
-|------|-------|------|---------------|----------------|-----------------------|-----------|-------------------------|
-| TC-AUTH-001 | USER_A | POST /api/users | 201 | | | NOT RUN | |
-| TC-AUTH-002 | USER_A | POST /api/auth/login | 200 | | | NOT RUN | |
-| TC-SEC-001  | USER_A | POST /api/events | 403 | | | NOT RUN | |
-| TC-SEC-002  | USER_A | PATCH /api/events/{code}/publish | 403 | | | NOT RUN | |
-| E2E-VEN-02  | Anónimo | GET /api/venues/active | 200 | | | NOT RUN | |
-| E2E-EVT-01  | ADMIN | POST /api/events | 201 | | | NOT RUN | |
-
-> Esta tabla se llenará con `PASS`, `FAIL` o `BLOCKED` conforme se ejecuten las pruebas en Postman.*
+| Caso | Actor | Ruta | HTTP esperado | HTTP observado | JSON/estado observado | Resultado | Evidencia / observación |
+|---|---|---|---|---|---|---|---|
+| **E2E-VEN-02** | Anónimo | `GET /api/venues/active` | 200 | 200 | Lista de venues activos | PASS | Se listan correctamente los venues con active=true. |
+| **E2E-VEN-01** | Anónimo | `GET /api/venues/{code}` | 200 | 200 | JSON con datos del venue | PASS | Consulta por código exitosa. |
+| **E2E-ART-03** | Anónimo | `GET /api/artists/active` | 200 | 200 | Lista de artistas | PASS | Devuelve artistas habilitados correctamente. |
+| **E2E-ART-01** | Anónimo | `GET /api/artists/{id}` | 200 | 200 | JSON con datos del artista | PASS | |
+| **E2E-ART-02** | Anónimo | `GET /api/artists/by-stage-name` | 200 | 200 | JSON del artista | PASS | Búsqueda por Stage Name funciona. |
+| **E2E-USR-01** | Anónimo | `POST /api/users` | 201 | 201 | UserResponse | PASS | Creación exitosa. La contraseña (hash) no se expone en la respuesta. |
+| **E2E-AUTH-01**| Anónimo | `POST /api/auth/login` | 200 | 200 | AuthResponse | PASS | Autenticación exitosa. Devuelve `accessToken` y `expiresIn`. |
+| **E2E-AUTH-02**| USER_A | `GET /api/auth/me` | 200 | 200 | Datos del usuario | PASS | Lee correctamente la identidad del token JWT. |
+| **E2E-USR-02** | USER_A | `GET /api/users/by-email` | 200 | 200 | Datos propios de USER_A | PASS | |
+| **E2E-USR-03** | USER_A | `GET /api/users/by-username` | 200 | 200 | Datos propios de USER_A | PASS | |
+| **TC-AUTH-007**| Anónimo | `GET /api/auth/me` | 401 | 401 | ErrorResponse | PASS | Seguridad: Bloquea acceso a ruta protegida sin Bearer Token. |
+| **TC-HTTP-001**| Anónimo | `POST /api/users` | 400 | 400 | ErrorResponse | PASS | Validación: Rechaza registro con contraseña < 12 caracteres (Bean Validation). |
+| **TC-HTTP-002**| Anónimo | `GET /api/venues/{code}` | 404 | 404 | ErrorRes
+ponse | PASS | Manejo de Excepciones: Devuelve formato correcto al no encontrar recurso. |
