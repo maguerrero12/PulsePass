@@ -48,7 +48,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Rutas públicas
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**", "/api/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/events/published", "/api/artists/**", "/api/venues/**").permitAll()
 
                         // Exclusivos de ADMIN
