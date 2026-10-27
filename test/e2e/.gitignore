@@ -1,0 +1,4 @@
+# Ignorar exportaciones con tokens o variables locales sensibles
+*.local.json
+*.secret.json
+.env
