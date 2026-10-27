@@ -47,18 +47,18 @@ public class SecurityConfig {
                         .accessDeniedHandler(deniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/events/published", "/api/artists/**", "/api/venues/**").permitAll()
+                        // Exclusivos de STAFF o ADMIN (rutas específicas antes de comodines de eventos)
+                        .requestMatchers(HttpMethod.PATCH, "/api/tickets/*/use").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/events/*/tickets/paid").hasAnyRole("STAFF", "ADMIN")
+
+                        // Rutas públicas (en eventos por código y por artista se protegen los borradores)
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**", "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events/published", "/api/events/by-artist", "/api/events/*", "/api/artists/**", "/api/venues/**").permitAll()
 
                         // Exclusivos de ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/events").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/events/*/publish").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/events/*/artists/*").hasRole("ADMIN")
-
-                        // Exclusivos de STAFF o ADMIN (Usando * en lugar de {ticketCode})
-                        .requestMatchers(HttpMethod.PATCH, "/api/tickets/*/use").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/events/*/tickets/paid").hasAnyRole("STAFF", "ADMIN")
 
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
