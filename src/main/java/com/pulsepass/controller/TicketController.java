@@ -48,6 +48,7 @@ public class TicketController {
     @PatchMapping("/api/tickets/{ticketCode}/cancel")
     public ResponseEntity<TicketResponse> cancel(@PathVariable String ticketCode) {
         authorizationService.verifyTicketOwnership(ticketCode);
+        authorizationService.verifyTicketCancelOwnership(ticketCode);
         return ResponseEntity.ok(ticketService.cancel(ticketCode));
     }
 

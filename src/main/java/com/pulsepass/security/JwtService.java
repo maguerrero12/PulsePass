@@ -19,7 +19,7 @@ public class JwtService {
 
     private final SecretKey key;
     private final String expectedIssuer;
-    private final Duration ttl; //
+    private final Duration ttl;
 
     public JwtService(
             @Value("${pulsepass.security.jwt.secret-base64}") String secretBase64,
@@ -33,9 +33,11 @@ public class JwtService {
 
     public String generateToken(SecurityPrincipal principal) {
         Instant now = Instant.now();
+        Long userId = principal.getId();
+        String subject = userId != null ? userId.toString() : principal.getUsername();
 
         return Jwts.builder()
-                .subject(principal.getUsername())
+                .subject(subject)
                 .issuer(expectedIssuer)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(ttl)))
