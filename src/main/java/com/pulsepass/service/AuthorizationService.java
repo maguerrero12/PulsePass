@@ -45,8 +45,21 @@ public class AuthorizationService {
         }
     }
 
+    public void verifyUserAccessByUsername(String username) {
+
+        SecurityPrincipal principal = getCurrentPrincipal();
+
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !principal.getUser().getUsername().equalsIgnoreCase(username)) {
+            throw new AccessDeniedException(
+                    "You do not have permission to access or modify this user's data");
+        }
+    }
+
     /**
-     * Valida que el ticket pertenezca al usuario autenticado o sea STAFF/ADMIN (FR-SEC-TKT-02/05).
+     * Valida que el ticket pertenezca al usuario autenticado o sea STAFF/ADMIN (FR-SEC-TKT-02).
      */
     public void verifyTicketOwnership(String ticketCode) {
 
@@ -65,6 +78,28 @@ public class AuthorizationService {
 
         if (!ticket.getUser().getId().equals(principal.getId())) {
             throw new AccessDeniedException("You do not have permission to access or modify this ticket");
+        }
+    }
+
+    /**
+     * Valida que el ticket pertenezca al usuario autenticado (USER) o sea ADMIN (FR-SEC-TKT-05).
+     */
+    public void verifyTicketCancelOwnership(String ticketCode) {
+
+        SecurityPrincipal principal = getCurrentPrincipal();
+
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return;
+        }
+
+        Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
+                .orElseThrow(() -> new AccessDeniedException("Ticket not found"));
+
+        if (!ticket.getUser().getId().equals(principal.getId())) {
+            throw new AccessDeniedException("You do not have permission to cancel this ticket");
         }
     }
 }

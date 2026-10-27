@@ -16,9 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//Spring Security llamará automáticamente cuando alguien intente hacer login o cuando se valide un token.
-// Buscará al usuario, sus credenciales y sus roles.
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -37,16 +34,25 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
-        // Buscar al usuario por email o por username (soportamos ambos logins)
+        // Buscar al usuario por email, username o ID interno (sub del JWT)
         User user = userRepository.findByEmail(identifier)
                 .orElseGet(() -> userRepository.findByUsername(identifier)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found with identifier: " + identifier)));
+                        .orElseGet(() -> {
+                            if (identifier != null && identifier.matches("\\d+")) {
+                                return userRepository.findById(Long.parseLong(identifier)).orElse(null);
+                            }
+                            return null;
+                        }));
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with identifier: " + identifier);
+        }
 
         // Buscar el hash de su contraseña
         UserCredential credential = credentialRepository.findById(user.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("Credentials not found for user"));
 
-        // cuscamos roles
+        // Buscamos roles
         List<UserRole> roles = roleRepository.findByUserId(user.getId());
 
         // Convertir los roles al formato que entiende Spring Security ("ROLE_USER", "ROLE_ADMIN")

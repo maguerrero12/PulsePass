@@ -7,7 +7,6 @@ import com.pulsepass.dto.response.AuthResponse;
 import com.pulsepass.dto.response.UserResponse;
 import com.pulsepass.repository.*;
 import com.pulsepass.service.AuthService;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,11 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -98,11 +95,11 @@ class SecurityPostgresIntegrationTest {
         RegisterUserRequest registerRequest = new RegisterUserRequest(
                 "integration_user",
                 "integration@pulsepass.com",
-                rawPassword,
                 "Test",
                 "User",
                 "3000000000",
                 "Bogota",
+                rawPassword,
                 LocalDate.of(1995, 8, 20)
         );
 
@@ -184,11 +181,11 @@ class SecurityPostgresIntegrationTest {
         RegisterUserRequest registerRequest = new RegisterUserRequest(
                 "owner_user",
                 "owner@pulsepass.com",
-                "OwnerPassword789!",
                 "Owner",
                 "User",
                 "3004445566",
                 "Cali",
+                "OwnerPassword789!",
                 LocalDate.of(1992, 11, 5)
         );
 
@@ -213,7 +210,7 @@ class SecurityPostgresIntegrationTest {
         event.setEventDate(LocalDateTime.now().plusDays(5));
         event.setMinimumAge(18);
         event.setStatus(EventStatus.PUBLISHED);
-        event.setCategory(EventCategory.MUSIC); // Reemplazar por tu enum si difiere (ej. EventCategory.MUSIC)
+        event.setCategory(EventCategory.MUSIC);
         event.setVenue(venue);
         event = eventRepository.saveAndFlush(event);
 

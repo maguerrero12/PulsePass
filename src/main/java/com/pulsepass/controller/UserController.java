@@ -38,6 +38,7 @@ public class UserController {
 
     @GetMapping("/by-username")
     public ResponseEntity<UserResponse> findByUsername(@RequestParam String username) {
+        authorizationService.verifyUserAccessByUsername(username);
         return ResponseEntity.ok(userService.findByUsername(username));
     }
 }
