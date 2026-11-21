@@ -3,9 +3,7 @@
 -- Archivo: test/e2e/fixtures/seed-e2e.sql
 -- Contraseña para los usuarios de prueba (admin_e2e, staff_e2e, inactivo_e2e):
 --   password
--- Hash BCrypt ($2a$10$) válido generado por BCryptPasswordEncoder para "password":
---   $2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG
--- =============================================================================
+
 
 -- 0. Limpieza idempotente de ejecuciones manuales previas
 DELETE FROM tickets WHERE event_id IN (
